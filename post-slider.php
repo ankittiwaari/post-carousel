@@ -11,25 +11,29 @@
  */
 add_shortcode('post_slider', 'post_slider_callback');
 
-function post_slider_callback()
+function post_slider_callback($atts)
 {
+    $a = shortcode_atts(array(
+        'cat_id' => '',
+            ), $atts);
     $my_posts = new WP_Query([
         'post_type' => 'post',
         'posts_per_page' => -1,
-        'post_status' => 'publish'
+        'post_status' => 'publish',
+        'cat' => $a['cat_id']
     ]);
     $html = '<div class="flexslider carousel"><ul class="slides">';
     if ($my_posts->have_posts()) {
         while ($my_posts->have_posts()) {
             $my_posts->the_post();
-            $html .= '<li>'
-                    . '<div class="ps-title">' . get_the_title() . '</div>'
-                    . '<div class="ps-content">' . get_the_content() . '</div>'
-                    . '</li>';
+            if (has_post_thumbnail($post->ID)) {
+                $html .= '<li>'
+                        . get_the_post_thumbnail($post->ID)
+                        . '</li>';
+            }
         }
     }
     $html .= '</ul></div>';
-
     return $html;
 }
 
